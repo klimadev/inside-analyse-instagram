@@ -18,8 +18,8 @@ export function AnalysisScreen({ originalImage, analysis, onApprove, isLoading }
       <div className="max-w-5xl mx-auto w-full">
         <header className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">REBRAND.AI</h1>
-            <p className="text-blue-600 font-medium">MODO: APRENDER (Lendo...)</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">kliamdev</h1>
+            <p className="text-blue-600 font-medium">Instagram Analyzer</p>
           </div>
         </header>
 

@@ -1,0 +1,218 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1782665531676,
+  "projectRoot": "/root/inside-analyse-instagram",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "react",
+        "version": "19.0.1",
+        "category": "frontend"
+      },
+      {
+        "name": "react-dom",
+        "version": "19.0.1",
+        "category": "frontend"
+      },
+      {
+        "name": "vite",
+        "version": "6.2.3",
+        "category": "build"
+      },
+      {
+        "name": "express",
+        "version": "4.21.2",
+        "category": "backend"
+      },
+      {
+        "name": "esbuild",
+        "version": "0.25.0",
+        "category": "build"
+      }
+    ],
+    "packageManager": "pnpm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npx tsc --noEmit 2>&1",
+    "testCommand": null,
+    "lintCommand": "pnpm lint",
+    "devCommand": "pnpm dev",
+    "scripts": {
+      "dev": "tsx server.ts",
+      "build": "vite build && esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+      "start": "node dist/server.cjs",
+      "preview": "vite preview",
+      "clean": "rm -rf dist server.js",
+      "lint": "tsc --noEmit"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": "type-based"
+  },
+  "structure": {
+    "isMonorepo": true,
+    "workspaces": [],
+    "mainDirectories": [
+      "assets",
+      "src"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "assets": {
+      "path": "assets",
+      "purpose": "Static assets",
+      "fileCount": 0,
+      "lastAccessed": 1782665531622,
+      "keyFiles": []
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1782665531622,
+      "keyFiles": [
+        "App.tsx",
+        "index.css",
+        "main.tsx",
+        "types.ts"
+      ]
+    },
+    "src/components": {
+      "path": "src/components",
+      "purpose": "UI components",
+      "fileCount": 4,
+      "lastAccessed": 1782665531673,
+      "keyFiles": [
+        "AnalysisScreen.tsx",
+        "CopilotScreen.tsx",
+        "MockupScreen.tsx"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "server.ts",
+      "accessCount": 4,
+      "lastAccessed": 1782666406763,
+      "type": "file"
+    },
+    {
+      "path": "vite.config.ts",
+      "accessCount": 3,
+      "lastAccessed": 1782665737671,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 3,
+      "lastAccessed": 1782666105616,
+      "type": "file"
+    },
+    {
+      "path": "index.html",
+      "accessCount": 2,
+      "lastAccessed": 1782665697060,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 2,
+      "lastAccessed": 1782665748628,
+      "type": "file"
+    },
+    {
+      "path": ".env.example",
+      "accessCount": 2,
+      "lastAccessed": 1782665748945,
+      "type": "file"
+    },
+    {
+      "path": "src/components/UploadScreen.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1782665749300,
+      "type": "file"
+    },
+    {
+      "path": "src/components/AnalysisScreen.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1782665749710,
+      "type": "file"
+    },
+    {
+      "path": "src/components/MockupScreen.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1782665750095,
+      "type": "file"
+    },
+    {
+      "path": "metadata.json",
+      "accessCount": 2,
+      "lastAccessed": 1782665750489,
+      "type": "file"
+    },
+    {
+      "path": "src/components/CopilotScreen.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1782665827261,
+      "type": "file"
+    },
+    {
+      "path": "src/main.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1782665587997,
+      "type": "file"
+    },
+    {
+      "path": "src/App.tsx",
+      "accessCount": 1,
+      "lastAccessed": 1782665588295,
+      "type": "file"
+    },
+    {
+      "path": "src/types.ts",
+      "accessCount": 1,
+      "lastAccessed": 1782665588722,
+      "type": "file"
+    },
+    {
+      "path": ".env",
+      "accessCount": 1,
+      "lastAccessed": 1782665615714,
+      "type": "file"
+    },
+    {
+      "path": "src/index.css",
+      "accessCount": 1,
+      "lastAccessed": 1782665634253,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

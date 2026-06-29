@@ -51,11 +51,11 @@ export function UploadScreen({ onUpload, isLoading }: UploadScreenProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-slate-50">
       <div className="max-w-2xl w-full">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-2">
-          REBRAND.AI
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-1">
+          kliamdev
         </h1>
         <p className="text-slate-500 mb-8 font-medium">
-          MODO: APRENDER (Inativo)
+          Instagram Analyzer
         </p>
 
         <motion.div

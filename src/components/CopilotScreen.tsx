@@ -96,8 +96,8 @@ export function CopilotScreen({ rebrand }: CopilotScreenProps) {
       {/* Sidebar with Guidelines */}
       <div className="w-80 bg-slate-900 text-white flex flex-col hidden md:flex border-r border-slate-800">
          <div className="p-6 border-b border-slate-800">
-            <h1 className="text-xl font-bold tracking-tight">REBRAND.AI</h1>
-            <p className="text-blue-400 font-medium text-sm mt-1">MODO: COPILOT (Ativo)</p>
+            <h1 className="text-xl font-bold tracking-tight">kliamdev</h1>
+            <p className="text-blue-400 font-medium text-sm mt-1">Instagram Analyzer</p>
          </div>
          
          <div className="p-6 flex-1 overflow-y-auto">

@@ -1,20 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# kliamdev — Instagram Analyzer & Rebrand
 
-# Run and deploy your AI Studio app
+Analisador de perfis do Instagram com IA usando Google Gemini.  
+Upload de print → análise → rebranding visual assistido por IA.
 
-This contains everything you need to run your app locally.
+## Execução Local
 
-View your app in AI Studio: https://ai.studio/apps/9fe7527d-2459-4683-9341-8bb6620d111f
+**Pré-requisitos:** Node.js
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Instalar dependências: `npm install` (ou `pnpm install`)
+2. Configurar `GEMINI_API_KEY` no `.env` (veja `.env.example`)
+3. Rodar: `npm run dev`

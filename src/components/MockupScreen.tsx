@@ -17,8 +17,8 @@ export function MockupScreen({ originalImage, editedImage, imageError, rebrand, 
       <div className="max-w-6xl mx-auto w-full">
         <header className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">REBRAND.AI</h1>
-            <p className="text-green-600 font-medium">MODO: ANTES vs DEPOIS</p>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">kliamdev</h1>
+            <p className="text-green-600 font-medium">Instagram Analyzer</p>
           </div>
           
           <button 

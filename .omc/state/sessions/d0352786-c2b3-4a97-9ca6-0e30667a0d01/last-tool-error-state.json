@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"ls /root/inside-analyse-instagram/node_modules/@google/genai/src/\",\"description\":\"List SDK source files\"}",
+  "error": "Exit code 2\nls: cannot access '/root/inside-analyse-instagram/node_modules/@google/genai/src/': No such file or directory",
+  "timestamp": "2026-06-28T17:01:56.851Z",
+  "retry_count": 1
+}
