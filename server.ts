@@ -128,89 +128,65 @@ Responda APENAS com o JSON, sem markdown ou texto adicional.`,
     }
   });
 
-  const CF_BASE = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run`;
-  const CF_AUTH = () => `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`;
+  const IMAGE_API = "http://127.0.0.1:7860/v1/chat/completions";
 
-  // ponytail: txt2img models confirmed working with JSON (no multipart needed)
-  const TXT2IMG_MODELS = [
-    { id: "@cf/stabilityai/stable-diffusion-xl-base-1.0",          name: "SDXL Base" },
-    { id: "@cf/black-forest-labs/flux-1-schnell",                  name: "Flux 1 Schnell" },
-    { id: "@cf/bytedance/stable-diffusion-xl-lightning",            name: "SDXL Lightning" },
-    { id: "@cf/lykon/dreamshaper-8-lcm",                           name: "Dreamshaper 8" },
-    { id: "@cf/leonardo/phoenix-1.0",                              name: "Phoenix 1.0" },
-    { id: "@cf/leonardo/lucid-origin",                             name: "Lucid Origin" },
-  ];
+  async function generateImage(prompt: string, imageBase64?: string): Promise<string> {
+    const messages = imageBase64
+      ? [{
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            { type: "image_url", image_url: { url: imageBase64 } },
+          ],
+        }]
+      : [{ role: "user", content: `Generate an image of ${prompt}, photorealistic style` }];
 
-  async function cfImage(model: string, body: Record<string, unknown>): Promise<string> {
-    const resp = await fetch(`${CF_BASE}/${model}`, {
+    const resp = await fetch(IMAGE_API, {
       method: "POST",
-      headers: { Authorization: CF_AUTH(), "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      headers: {
+        Authorization: "Bearer 123456",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemini-2.5-flash-image",
+        messages,
+        temperature: 1,
+      }),
     });
     if (!resp.ok) {
       const errText = await resp.text().catch(() => "unknown error");
-      throw new Error(`CF Workers AI error (${resp.status}): ${errText.slice(0, 200)}`);
+      throw new Error(`Image API error (${resp.status}): ${errText.slice(0, 200)}`);
     }
-    const buf = Buffer.from(await resp.arrayBuffer());
-    return `data:image/png;base64,${buf.toString("base64")}`;
+    const data = await resp.json();
+    const markdown = data.choices[0].message.content;
+    const match = markdown.match(/data:image\/png;base64,([A-Za-z0-9+/=]+)/);
+    if (!match) throw new Error("No base64 image found in response");
+    return `data:image/png;base64,${match[1]}`;
   }
 
-  // txt2img — gera com todos os modelos em paralelo
   app.post("/api/generate-image", async (req, res) => {
     try {
-      const { prompt, width, height, negative_prompt, guidance, num_steps } = req.body;
+      const { prompt } = req.body;
       if (!prompt) {
         return res.status(400).json({ error: "Missing prompt" });
       }
 
-      const tasks = TXT2IMG_MODELS.map(m => async () => {
-        try {
-          const base64 = await cfImage(m.id, {
-            prompt,
-            width: width || 1024,
-            height: height || 1024,
-            negative_prompt: negative_prompt || "",
-            guidance: guidance || 7.5,
-            num_steps: num_steps || 20,
-          });
-          return { model: m.name, modelId: m.id, base64 };
-        } catch (e: any) {
-          console.error(`  ${m.name} failed:`, e.message);
-          return null;
-        }
-      });
-
-      const results = (await Promise.all(tasks.map(t => t()))).filter(Boolean);
-      if (results.length === 0) {
-        return res.status(500).json({ error: "All models failed to generate" });
-      }
-
-      res.json({ results });
+      const base64 = await generateImage(prompt);
+      res.json({ results: [{ model: "gemini-2.5-flash-image", base64 }] });
     } catch (error: any) {
       console.error("Error generating image:", error);
       res.status(500).json({ error: error?.message || "Failed to generate image" });
     }
   });
 
-  // img2img — SD 1.5 (único modelo CF com img2img funcional, 512x512)
   app.post("/api/edit-profile-image", async (req, res) => {
     try {
-      const { imageBase64, prompt, strength, negative_prompt } = req.body;
-      if (!imageBase64 || !prompt) {
-        return res.status(400).json({ error: "Missing imageBase64 or prompt" });
+      const { prompt, imageBase64 } = req.body;
+      if (!prompt) {
+        return res.status(400).json({ error: "Missing prompt" });
       }
 
-      const base64Data = imageBase64.replace(/^data:image\/[a-zA-Z]*;base64,/, "");
-
-      const base64 = await cfImage("@cf/runwayml/stable-diffusion-v1-5-img2img", {
-        prompt,
-        image_b64: base64Data,
-        strength: strength ?? 0.8,
-        width: 512,
-        height: 512,
-        negative_prompt: negative_prompt || "",
-      });
-
+      const base64 = await generateImage(prompt, imageBase64);
       res.json({ base64 });
     } catch (error: any) {
       console.error("Error editing image:", error);
