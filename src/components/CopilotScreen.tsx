@@ -59,25 +59,25 @@ export function CopilotScreen({ rebrand }: CopilotScreenProps) {
 
   const generateImagesForItems = async (items: CopilotItem[], messageIndex: number) => {
     const updatedItems = [...items];
-    
-    // We update the state message by message index, but since React state is tricky,
-    // let's do it carefully.
+
     for (let i = 0; i < updatedItems.length; i++) {
        if (updatedItems[i].imagem_prompt) {
           try {
              const res = await fetch('/api/generate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: updatedItems[i].imagem_prompt, aspectRatio: '1:1' })
+                body: JSON.stringify({ prompt: updatedItems[i].imagem_prompt })
              });
              if (res.ok) {
                 const imgData = await res.json();
-                updatedItems[i].imagem_gerada = imgData.base64;
-                
-                // Update state
+                updatedItems[i].imagens_geradas = imgData.results || [];
+                if (imgData.results?.length > 0) {
+                   updatedItems[i].imagem_gerada = imgData.results[0].base64;
+                }
+
                 setMessages(prev => {
                    const newMsgs = [...prev];
-                   const msgToUpdate = newMsgs[newMsgs.length - 1]; // Assuming it's the last one
+                   const msgToUpdate = newMsgs[newMsgs.length - 1];
                    if (msgToUpdate.role === 'assistant' && msgToUpdate.items) {
                        msgToUpdate.items = [...updatedItems];
                    }
@@ -152,29 +152,50 @@ export function CopilotScreen({ rebrand }: CopilotScreenProps) {
                      {m.items && m.items.length > 0 && (
                         <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
                            {m.items.map((item, idx) => (
-                              <div key={idx} className="flex-shrink-0 w-64 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm relative group">
-                                 <div className="aspect-square bg-slate-200 relative flex items-center justify-center">
-                                    {item.imagem_gerada ? (
-                                       <img src={item.imagem_gerada} alt="Generated" className="w-full h-full object-cover" />
-                                    ) : (
-                                       <div className="flex flex-col items-center">
-                                          <Loader2 className="w-6 h-6 animate-spin text-slate-400 mb-2" />
-                                          <span className="text-xs text-slate-500 font-medium">Gerando Imagem...</span>
-                                       </div>
-                                    )}
-                                    {item.texto && (
-                                       <div className="absolute inset-0 flex items-center justify-center p-6 bg-black/30">
-                                          <h3 className="text-white font-bold text-center text-xl drop-shadow-md">{item.texto}</h3>
-                                       </div>
-                                    )}
-                                 </div>
+                              <div key={idx} className="flex-shrink-0 w-72 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm relative group">
+                                 {item.imagens_geradas && item.imagens_geradas.length > 0 ? (
+                                    <div className="grid grid-cols-2 gap-1 p-1">
+                                       {item.imagens_geradas.map((r, ri) => (
+                                          <div key={ri} className="aspect-square bg-slate-200 rounded-lg overflow-hidden relative">
+                                             <img src={r.base64} alt={r.model} className="w-full h-full object-cover" />
+                                             <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] font-medium px-1 py-0.5 truncate text-center">{r.model}</span>
+                                          </div>
+                                       ))}
+                                    </div>
+                                 ) : (
+                                    <div className="aspect-square bg-slate-200 flex items-center justify-center">
+                                       {item.imagem_gerada ? (
+                                          <img src={item.imagem_gerada} alt="Generated" className="w-full h-full object-cover" />
+                                       ) : (
+                                          <div className="flex flex-col items-center">
+                                             <Loader2 className="w-6 h-6 animate-spin text-slate-400 mb-2" />
+                                             <span className="text-xs text-slate-500 font-medium">Gerando Imagem...</span>
+                                          </div>
+                                       )}
+                                    </div>
+                                 )}
+                                 {item.texto && item.imagens_geradas?.length ? (
+                                    <div className="absolute inset-0 flex items-center justify-center p-4 bg-black/30 pointer-events-none">
+                                       <h3 className="text-white font-bold text-center text-lg drop-shadow-md">{item.texto}</h3>
+                                    </div>
+                                 ) : item.texto && (
+                                    <div className="absolute inset-0 flex items-center justify-center p-6 bg-black/30 pointer-events-none">
+                                       <h3 className="text-white font-bold text-center text-xl drop-shadow-md">{item.texto}</h3>
+                                    </div>
+                                 )}
                                  {item.legenda && (
                                     <div className="p-3 text-xs text-slate-600 bg-white border-t border-slate-100">
                                        <span className="font-bold text-slate-800 mr-1">{rebrand.novo_perfil.novo_user}</span>
                                        {item.legenda}
                                     </div>
                                  )}
-                                 {item.imagem_gerada && (
+                                 {item.imagens_geradas?.length ? (
+                                    <div className="absolute top-2 right-2 flex gap-1">
+                                       <button className="bg-white/90 p-1.5 rounded-lg shadow opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <Download className="w-4 h-4 text-slate-700" />
+                                       </button>
+                                    </div>
+                                 ) : item.imagem_gerada && (
                                     <button className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-lg shadow opacity-0 group-hover:opacity-100 transition-opacity">
                                        <Download className="w-4 h-4 text-slate-700" />
                                     </button>

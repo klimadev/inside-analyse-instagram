@@ -119,20 +119,38 @@
   "hotPaths": [
     {
       "path": "server.ts",
+      "accessCount": 17,
+      "lastAccessed": 1782746071930,
+      "type": "file"
+    },
+    {
+      "path": "src/components/CopilotScreen.tsx",
+      "accessCount": 15,
+      "lastAccessed": 1782746534721,
+      "type": "file"
+    },
+    {
+      "path": "src/components/MockupScreen.tsx",
+      "accessCount": 5,
+      "lastAccessed": 1782742877413,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
       "accessCount": 4,
-      "lastAccessed": 1782666406763,
+      "lastAccessed": 1782741566210,
+      "type": "file"
+    },
+    {
+      "path": "src/types.ts",
+      "accessCount": 4,
+      "lastAccessed": 1782745403601,
       "type": "file"
     },
     {
       "path": "vite.config.ts",
       "accessCount": 3,
       "lastAccessed": 1782665737671,
-      "type": "file"
-    },
-    {
-      "path": "package.json",
-      "accessCount": 3,
-      "lastAccessed": 1782666105616,
       "type": "file"
     },
     {
@@ -166,21 +184,9 @@
       "type": "file"
     },
     {
-      "path": "src/components/MockupScreen.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1782665750095,
-      "type": "file"
-    },
-    {
       "path": "metadata.json",
       "accessCount": 2,
       "lastAccessed": 1782665750489,
-      "type": "file"
-    },
-    {
-      "path": "src/components/CopilotScreen.tsx",
-      "accessCount": 2,
-      "lastAccessed": 1782665827261,
       "type": "file"
     },
     {
@@ -193,12 +199,6 @@
       "path": "src/App.tsx",
       "accessCount": 1,
       "lastAccessed": 1782665588295,
-      "type": "file"
-    },
-    {
-      "path": "src/types.ts",
-      "accessCount": 1,
-      "lastAccessed": 1782665588722,
       "type": "file"
     },
     {

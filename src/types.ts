@@ -35,6 +35,7 @@ export interface CopilotItem {
   legenda?: string;
   imagem_prompt: string;
   imagem_gerada?: string;
+  imagens_geradas?: { model: string; base64: string }[];
 }
 
 export interface CopilotResponse {

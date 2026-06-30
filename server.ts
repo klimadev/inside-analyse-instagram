@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -127,89 +128,90 @@ Responda APENAS com o JSON, sem markdown ou texto adicional.`,
     }
   });
 
+  const CF_BASE = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run`;
+  const CF_AUTH = () => `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`;
+
+  // ponytail: txt2img models confirmed working with JSON (no multipart needed)
+  const TXT2IMG_MODELS = [
+    { id: "@cf/stabilityai/stable-diffusion-xl-base-1.0",          name: "SDXL Base" },
+    { id: "@cf/black-forest-labs/flux-1-schnell",                  name: "Flux 1 Schnell" },
+    { id: "@cf/bytedance/stable-diffusion-xl-lightning",            name: "SDXL Lightning" },
+    { id: "@cf/lykon/dreamshaper-8-lcm",                           name: "Dreamshaper 8" },
+    { id: "@cf/leonardo/phoenix-1.0",                              name: "Phoenix 1.0" },
+    { id: "@cf/leonardo/lucid-origin",                             name: "Lucid Origin" },
+  ];
+
+  async function cfImage(model: string, body: Record<string, unknown>): Promise<string> {
+    const resp = await fetch(`${CF_BASE}/${model}`, {
+      method: "POST",
+      headers: { Authorization: CF_AUTH(), "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!resp.ok) {
+      const errText = await resp.text().catch(() => "unknown error");
+      throw new Error(`CF Workers AI error (${resp.status}): ${errText.slice(0, 200)}`);
+    }
+    const buf = Buffer.from(await resp.arrayBuffer());
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  }
+
+  // txt2img — gera com todos os modelos em paralelo
   app.post("/api/generate-image", async (req, res) => {
     try {
-      const { prompt, aspectRatio } = req.body;
+      const { prompt, width, height, negative_prompt, guidance, num_steps } = req.body;
       if (!prompt) {
         return res.status(400).json({ error: "Missing prompt" });
       }
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [{ text: prompt }]
-        },
-        config: {
-          imageConfig: {
-            aspectRatio: aspectRatio || "1:1"
-          }
+      const tasks = TXT2IMG_MODELS.map(m => async () => {
+        try {
+          const base64 = await cfImage(m.id, {
+            prompt,
+            width: width || 1024,
+            height: height || 1024,
+            negative_prompt: negative_prompt || "",
+            guidance: guidance || 7.5,
+            num_steps: num_steps || 20,
+          });
+          return { model: m.name, modelId: m.id, base64 };
+        } catch (e: any) {
+          console.error(`  ${m.name} failed:`, e.message);
+          return null;
         }
       });
 
-      let base64Image = null;
-      if (response.candidates && response.candidates.length > 0) {
-         for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-               base64Image = part.inlineData.data;
-               break;
-            }
-         }
-      }
-      
-      if (!base64Image) {
-         return res.status(500).json({ error: "No image generated" });
+      const results = (await Promise.all(tasks.map(t => t()))).filter(Boolean);
+      if (results.length === 0) {
+        return res.status(500).json({ error: "All models failed to generate" });
       }
 
-      res.json({ base64: `data:image/jpeg;base64,${base64Image}` });
+      res.json({ results });
     } catch (error: any) {
       console.error("Error generating image:", error);
       res.status(500).json({ error: error?.message || "Failed to generate image" });
     }
   });
 
+  // img2img — SD 1.5 (único modelo CF com img2img funcional, 512x512)
   app.post("/api/edit-profile-image", async (req, res) => {
     try {
-      const { imageBase64, prompt } = req.body;
+      const { imageBase64, prompt, strength, negative_prompt } = req.body;
       if (!imageBase64 || !prompt) {
         return res.status(400).json({ error: "Missing imageBase64 or prompt" });
       }
 
-      const mimeTypeMatch = imageBase64.match(/^data:(image\/[a-zA-Z]*);base64,/);
-      const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : "image/jpeg";
       const base64Data = imageBase64.replace(/^data:image\/[a-zA-Z]*;base64,/, "");
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash-image",
-        contents: {
-          parts: [
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: mimeType,
-              },
-            },
-            {
-              text: prompt,
-            },
-          ],
-        },
+      const base64 = await cfImage("@cf/runwayml/stable-diffusion-v1-5-img2img", {
+        prompt,
+        image_b64: base64Data,
+        strength: strength ?? 0.8,
+        width: 512,
+        height: 512,
+        negative_prompt: negative_prompt || "",
       });
 
-      let editedImageBase64 = null;
-      if (response.candidates && response.candidates.length > 0) {
-         for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-               editedImageBase64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-               break;
-            }
-         }
-      }
-
-      if (!editedImageBase64) {
-         return res.status(500).json({ error: "No image generated" });
-      }
-
-      res.json({ base64: editedImageBase64 });
+      res.json({ base64 });
     } catch (error: any) {
       console.error("Error editing image:", error);
       res.status(500).json({ error: error?.message || "Failed to edit image" });

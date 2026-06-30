@@ -75,7 +75,7 @@ export function MockupScreen({ originalImage, editedImage, imageError, rebrand, 
                    ) : (
                      <div className="flex flex-col items-center p-6 text-center">
                         <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-4" />
-                        <span className="text-sm font-medium text-slate-600">Gerando edição visual com Gemini 2.5 Flash Image...</span>
+                        <span className="text-sm font-medium text-slate-600">Gerando edição visual com IA...</span>
                      </div>
                    )}
                 </div>
